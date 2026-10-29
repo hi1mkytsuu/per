@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Oficina de Engenharia Fazbear - Terminal de Customização de Animatrônicos</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            fazbear: {
+              black: '#08080a',
+              dark: '#101216',
+              panel: '#161920',
+              border: '#262938',
+              accent: '#ff9d00',
+              red: '#ff2a2a',
+              green: '#00ff66',
+              cyan: '#00e5ff',
+              yellow: '#ffd700',
+              pink: '#ff499e'
+            }
+          },
+          fontFamily: {
+            mono: ['"Share Tech Mono"', 'monospace'],
+            crt: ['"VT323"', 'monospace'],
+            header: ['"Orbitron"', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #060608;
+      color: #d1d5db;
+      overflow-x: hidden;
+      user-select: none;
+    }
+    
+    /* Efeito de Tela CRT & Tubo de Imagem Industrial */
+    .crt-overlay {
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.28) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+      background-size: 100% 4px, 6px 100%;
+      pointer-events: none;
+    }
+
+    .vignette {
+      box-shadow: inset 0 0 120px rgba(0, 0, 0, 0.9);
+      pointer-events: none;
+    }
+
+    /* Scrollbar personalizada da oficina */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #101216;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #ff9d00;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #ffb733;
+    }
+
+    /* Padrão de Grade de Engenharia */
+    .bg-grid-pattern {
+      background-image: radial-gradient(rgba(255, 157, 0, 0.15) 1px, transparent 0);
+      background-size: 24px 24px;
+    }
+
+    .hazard-stripe {
+      background: repeating-linear-gradient(
+        -45deg,
+        #ff9d00,
+        #ff9d00 12px,
+        #101216 12px,
+        #101216 24px
+      );
+    }
+
+    /* Estilização dos Sliders */
+    input[type=range] {
+      -webkit-appearance: none;
+      background: #101216;
+      border: 1px solid #262938;
+      border-radius: 4px;
+      height: 8px;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 18px;
+      width: 12px;
+      border-radius: 2px;
+      background: #ff9d00;
+      cursor: pointer;
+      box-shadow: 0 0 8px #ff9d00;
+    }
+
+    /* Neon & Neumorfismo Obscuro */
+    .glow-orange { text-shadow: 0 0 8px rgba(255, 157, 0, 0.75); }
+    .glow-red { text-shadow: 0 0 8px rgba(255, 42, 42, 0.85); }
+    .glow-green { text-shadow: 0 0 8px rgba(0, 255, 102, 0.75); }
+    .box-glow-orange { box-shadow: 0 0 14px rgba(255, 157, 0, 0.35); }
+
+    /* Animação de Tremores e Espasmo Animatrônico (Modo Teste de Energia) */
+    @keyframes animatronic-twitch {
+      0% { transform: translate(0, 0) rotate(0deg); }
+      91% { transform: translate(0, 0) rotate(0deg); }
+      92% { transform: translate(-4px, 2px) rotate(-1.5deg); }
+      93% { transform: translate(5px, -2px) rotate(2deg); }
+      94% { transform: translate(-3px, -3px) rotate(-1deg); }
+      95% { transform: translate(4px, 3px) rotate(1.5deg); }
+      96% { transform: translate(0, 0) rotate(0deg); }
+      100% { transform: translate(0, 0) rotate(0deg); }
+    }
+
+    .twitching {
+      animation: animatronic-twitch 2.2s infinite;
+    }
+
+    @keyframes eye-pulse {
+      0%, 100% { filter: drop-shadow(0 0 3px currentColor); opacity: 0.85; }
+      50% { filter: drop-shadow(0 0 14px currentColor); opacity: 1; }
+    }
+    .eye-glowing {
+      animation: eye-pulse 1s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body class="h-screen w-screen flex flex-col font-mono antialiased select-none overflow-hidden bg-fazbear-black">
+
+  <!-- Camadas CRT de Overlay Retro -->
+  <div class="fixed inset-0 crt-overlay z-50 pointer-events-none"></div>
+  <div class="fixed inset-0 vignette z-40 pointer-events-none"></div>
+
+  <!-- CABEÇALHO DO TERMINAL INDUSTRIAL -->
+  <header class="h-14 bg-fazbear-dark border-b border-fazbear-border flex items-center justify-between px-4 z-30 shrink-0">
+    <div class="flex items-center space-x-3">
+      <div class="w-8 h-8 rounded bg-fazbear-accent flex items-center justify-center text-fazbear-black font-black text-xl font-header">
+        FE
+      </div>
+      <div>
+        <h1 class="font-header font-bold text-sm tracking-wider text-fazbear-accent flex items-center gap-2">
+          FAZBEAR ENTERTAINMENT <span class="text-xs bg-fazbear-border px-1.5 py-0.5 rounded text-gray-400 font-mono">v5.2.0 PT-BR</span>
+        </h1>
+        <p class="text-[10px] text-gray-400 uppercase tracking-widest font-crt">TERMINAL DE CUSTOMIZAÇÃO & MONTAGEM DE ANIMATRÔNICOS</p>
+      </div>
+    </div>
+
+    <!-- Presets Globais Rápidos e Controle de Áudio -->
+    <div class="flex items-center space-x-2">
+      <span class="hidden md:inline-block text-xs text-gray-400 mr-1">Arquétipos Globais:</span>
+      <button onclick="aplicarArquetipoGlobal('endo')" class="px-2.5 py-1 bg-fazbear-panel hover:bg-gray-800 border border-gray-600 rounded text-xs text-gray-300 transition flex items-center gap-1">
+        <i class="fa-solid fa-gear text-[10px]"></i> Endo Puro
+      </button>
+      <button onclick="aplicarArquetipoGlobal('classic')" class="px-2.5 py-1 bg-fazbear-panel hover:bg-amber-900/40 border border-amber-700/50 rounded text-xs text-amber-400 transition flex items-center gap-1">
+        <i class="fa-solid fa-bear-head text-[10px]"></i> Clássico
+      </button>
+      <button onclick="aplicarArquetipoGlobal('toy')" class="px-2.5 py-1 bg-fazbear-panel hover:bg-cyan-900/40 border border-cyan-700/50 rounded text-xs text-cyan-400 transition flex items-center gap-1">
+        <i class="fa-solid fa-wand-magic-sparkles text-[10px]"></i> Toy
+      </button>
+      <button onclick="aplicarArquetipoGlobal('withered')" class="px-2.5 py-1 bg-fazbear-panel hover:bg-red-900/40 border border-red-700/50 rounded text-xs text-red-400 transition flex items-center gap-1">
+        <i class="fa-solid fa-skull text-[10px]"></i> Withered
+      </button>
+      <button onclick="aplicarArquetipoGlobal('funtime')" class="px-2.5 py-1 bg-fazbear-panel hover:bg-pink-900/40 border border-pink-700/50 rounded text-xs text-pink-400 transition flex items-center gap-1">
+        <i class="fa-solid fa-robot text-[10px]"></i> Funtime
+      </button>
+      <button onclick="aplicarArquetipoGlobal('nightmare')" class="px-2.5 py-1 bg-fazbear-panel hover:bg-purple-900/40 border border-purple-700/50 rounded text-xs text-purple-400 transition flex items-center gap-1">
+        <i class="fa-solid fa-biohazard text-[10px]"></i> Nightmare
+      </button>
+
+      <div class="h-6 w-px bg-fazbear-border mx-2"></div>
+
+      <button id="soundToggleBtn" onclick="alternarSom()" class="p-2 bg-fazbear-panel border border-fazbear-border hover:border-fazbear-accent rounded text-fazbear-accent transition text-xs" title="Som do Terminal">
+        <i class="fa-solid fa-volume-high" id="soundIcon"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- PAINEL PRINCIPAL (3 COLUNAS DE TRABALHO) -->
+  <div class="flex-1 flex overflow-hidden relative">
+
+    <!-- COLUNA ESQUERDA: Seletor Modular de Partes e Estrutura -->
+    <aside class="w-80 bg-fazbear-dark border-r border-fazbear-border flex flex-col z-20 shrink-0">
+      <div class="p-3 border-b border-fazbear-border bg-fazbear-panel flex justify-between items-center">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-fazbear-accent flex items-center gap-2 font-header">
+          <i class="fa-solid fa-cubes"></i> Anatomia Animatrônica
+        </h2>
+        <span class="text-[10px] bg-fazbear-border text-amber-400 px-2 py-0.5 rounded font-mono" id="partCountLabel">12 Módulos</span>
+      </div>
+
+      <!-- Navegação por Categoria de Partes -->
+      <div class="p-2 border-b border-fazbear-border grid grid-cols-4 gap-1 bg-fazbear-black/50 text-[11px]">
+        <button onclick="filtrarPartes('todas')" id="btn-cat-todas" class="part-cat-btn py-1 rounded text-center bg-fazbear-accent text-fazbear-black font-bold">Todas</button>
+        <button onclick="filtrarPartes('cabeca')" id="btn-cat-cabeca" class="part-cat-btn py-1 rounded text-center bg-fazbear-panel hover:bg-fazbear-border text-gray-300">Cabeça</button>
+        <button onclick="filtrarPartes('tronco')" id="btn-cat-tronco" class="part-cat-btn py-1 rounded text-center bg-fazbear-panel hover:bg-fazbear-border text-gray-300">Tronco</button>
+        <button onclick="filtrarPartes('membros')" id="btn-cat-membros" class="part-cat-btn py-1 rounded text-center bg-fazbear-panel hover:bg-fazbear-border text-gray-300">Membros</button>
+      </div>
+
+      <!-- Lista Scrollável de Partes Customizáveis -->
+      <div class="flex-1 overflow-y-auto p-2 space-y-1.5" id="partsList">
+        <!-- Linhas geradas via JavaScript -->
+      </div>
+    </aside>
+
+    <!-- COLUNA CENTRAL: Canvas Vetorial Interativo SVG -->
+    <main class="flex-1 bg-fazbear-black relative flex flex-col justify-between items-center p-4 bg-grid-pattern overflow-hidden">
+      
+      <!-- Controles Superiores do Viewport -->
+      <div class="w-full flex justify-between items-center z-10 pointer-events-none">
+        <div class="pointer-events-auto bg-fazbear-dark/90 backdrop-blur border border-fazbear-border px-3 py-1.5 rounded-lg flex items-center gap-3">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-fazbear-green animate-pulse"></span>
+            <span class="text-xs text-gray-300 uppercase font-mono">Núcleo Endoesqueleto: Ativo</span>
+          </div>
+          <button onclick="alternarVisibilidadeEndo()" class="text-xs text-fazbear-accent hover:underline ml-2">
+            <i class="fa-solid fa-eye" id="endoVisIcon"></i> Ver Endo
+          </button>
+        </div>
+
+        <div class="pointer-events-auto flex gap-2">
+          <button onclick="gerarHibridoAleatorio()" class="px-3 py-1.5 bg-fazbear-panel hover:bg-fazbear-border border border-fazbear-accent/50 text-fazbear-accent rounded text-xs flex items-center gap-1.5 transition">
+            <i class="fa-solid fa-dice"></i> Híbrido Aleatório
+          </button>
+
+          <button id="powerTestBtn" onclick="alternarTesteEnergia()" class="px-4 py-1.5 bg-fazbear-red/20 hover:bg-fazbear-red/40 border border-fazbear-red text-fazbear-red rounded text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition glow-red">
+            <i class="fa-solid fa-power-off"></i> <span id="powerBtnText">LIGAR ANIMATRÔNICO / TESTE</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Moldura do Animatrônico em SVG -->
+      <div class="relative flex-1 w-full flex items-center justify-center my-2 max-h-[82vh] max-w-[650px] aspect-[3/4]">
+        <div id="canvasStage" class="relative w-full h-full flex items-center justify-center transition-all duration-300">
+          <svg id="animatronicSvg" viewBox="0 0 500 650" class="w-full h-full drop-shadow-[0_10px_25px_rgba(0,0,0,0.85)]" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <!-- Filtros de Ruído e Textura de Corrosão -->
+              <filter id="noiseFilter">
+                <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" result="noise"/>
+                <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.18 0"/>
+                <feComposite operator="in" in2="SourceGraphic"/>
+              </filter>
+              
+              <!-- Gradiente de Metal Cromado Funtime -->
+              <linearGradient id="chromeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#ffffff"/>
+                <stop offset="25%" stop-color="#aaaaaa"/>
+                <stop offset="50%" stop-color="#f0f0f0"/>
+                <stop offset="75%" stop-color="#666666"/>
+                <stop offset="100%" stop-color="#dddddd"/>
+              </linearGradient>
+
+              <!-- Gradiente de Endoesqueleto de Aço Escuro -->
+              <linearGradient id="endoMetal" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#22252a"/>
+                <stop offset="50%" stop-color="#555a66"/>
+                <stop offset="100%" stop-color="#181a1e"/>
+              </linearGradient>
+
+              <!-- Gradiente de Ferrugem de Sucata -->
+              <linearGradient id="rustGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#8b3a1a"/>
+                <stop offset="50%" stop-color="#4a1c09"/>
+                <stop offset="100%" stop-color="#2a0c02"/>
+              </linearGradient>
+            </defs>
+
+            <!-- 1. CAMADA BASE DO ENDOESQUELETO (Endo-01 / Endo-02) -->
+            <g id="layer-endoskeleton" class="transition-opacity duration-300">
+              <!-- Coluna Central & Hastes do Pescoço -->
+              <rect x="242" y="110" width="16" height="240" fill="url(#endoMetal)" rx="3" stroke="#111" stroke-width="2"/>
+              <circle cx="250" cy="150" r="10" fill="#353842" stroke="#111"/>
+              <circle cx="250" cy="190" r="10" fill="#353842" stroke="#111"/>
+              <circle cx="250" cy="230" r="10" fill="#353842" stroke="#111"/>
+              <circle cx="250" cy="270" r="10" fill="#353842" stroke="#111"/>
+
+              <!-- Barra Transversal dos Ombros -->
+              <rect x="150" y="145" width="200" height="14" fill="url(#endoMetal)" rx="4" stroke="#111" stroke-width="2"/>
+              <circle cx="160" cy="152" r="12" fill="#444" stroke="#111"/>
+              <circle cx="340" cy="152" r="12" fill="#444" stroke="#111"/>
+
+              <!-- Barra da Bacia / Quadril -->
+              <rect x="180" y="315" width="140" height="16" fill="url(#endoMetal)" rx="4" stroke="#111" stroke-width="2"/>
+              <circle cx="195" cy="323" r="10" fill="#444" stroke="#111"/>
+              <circle cx="305" cy="323" r="10" fill="#444" stroke="#111"/>
+
+              <!-- Hastes dos Braços Endo -->
+              <line x1="160" y1="152" x2="130" y2="240" stroke="url(#endoMetal)" stroke-width="12" stroke-linecap="round"/>
+              <circle cx="130" cy="240" r="9" fill="#353842"/>
+              <line x1="130" y1="240" x2="110" y2="320" stroke="url(#endoMetal)" stroke-width="10" stroke-linecap="round"/>
+
+              <line x1="340" y1="152" x2="370" y2="240" stroke="url(#endoMetal)" stroke-width="12" stroke-linecap="round"/>
+              <circle cx="370" cy="240" r="9" fill="#353842"/>
+              <line x1="370" y1="240" x2="390" y2="320" stroke="url(#endoMetal)" stroke-width="10" stroke-linecap="round"/>
+
+              <!-- Hastes das Pernas Endo -->
+              <line x1="195" y1="323" x2="190" y2="440" stroke="url(#endoMetal)" stroke-width="14" stroke-linecap="round"/>
+              <circle cx="190" cy="440" r="11" fill="#353842"/>
+              <line x1="190" y1="440" x2="185" y2="550" stroke="url(#endoMetal)" stroke-width="12" stroke-linecap="round"/>
+
+              <line x1="305" y1="323" x2="310" y2="440" stroke="url(#endoMetal)" stroke-width="14" stroke-linecap="round"/>
+              <circle cx="310" cy="440" r="11" fill="#353842"/>
+              <line x1="310" y1="440" x2="315" y2="550" stroke="url(#endoMetal)" stroke-width="12" stroke-linecap="round"/>
+
+              <!-- Estrutura do Crânio Endo -->
+              <rect x="230" y="70" width="40" height="45" fill="url(#endoMetal)" rx="6" stroke="#111" stroke-width="2"/>
+              <circle cx="238" cy="85" r="10" fill="#111"/>
+              <circle cx="262" cy="85" r="10" fill="#111"/>
+              <path d="M 235 102 L 265 102 L 265 110 L 235 110 Z" fill="#ccc" stroke="#222" stroke-width="1.5"/>
+
+              <!-- Cabos e Fios Elétricos Expostos -->
+              <path d="M 240 120 Q 230 180 245 220" fill="none" stroke="#ff3333" stroke-width="3" opacity="0.8"/>
+              <path d="M 255 120 Q 270 170 252 230" fill="none" stroke="#00e5ff" stroke-width="2" opacity="0.8"/>
+              <path d="M 248 120 Q 235 250 258 310" fill="none" stroke="#ffd700" stroke-width="2.5" opacity="0.8"/>
+            </g>
+
+            <!-- 2. CAMADAS DINÂMICAS DE CARCAÇA ANIMATRÔNICA -->
+            <g id="layer-feet"></g>
+            <g id="layer-legs"></g>
+            <g id="layer-pelvis"></g>
+            <g id="layer-torso"></g>
+            <g id="layer-arms"></g>
+            <g id="layer-hands"></g>
+            <g id="layer-shoulders"></g>
+            <g id="layer-head"></g>
+            <g id="layer-ears"></g>
+            <g id="layer-eyes"></g>
+            <g id="layer-accessories"></g>
+          </svg>
+
+          <!-- Overlay de Alerta no Modo Teste de Energia -->
+          <div id="jumpscareGlow" class="absolute inset-0 bg-red-600/0 pointer-events-none transition-colors duration-100 rounded-lg"></div>
+        </div>
+      </div>
+
+      <!-- PAINEL DE CONTROLE INFERIOR: Ajustes da Parte Selecionada -->
+      <div class="w-full bg-fazbear-dark/95 border border-fazbear-border rounded-lg p-3 z-20 shadow-xl backdrop-blur">
+        <div class="flex flex-col lg:flex-row items-center justify-between gap-4">
+          
+          <!-- Título da Parte Ativa -->
+          <div class="flex items-center gap-3 w-full lg:w-auto">
+            <div class="w-10 h-10 rounded bg-fazbear-panel border border-fazbear-accent flex items-center justify-center text-fazbear-accent text-lg">
+              <i id="selectedPartIcon" class="fa-solid fa-mask"></i>
+            </div>
+            <div>
+              <div class="text-[10px] text-gray-400 uppercase tracking-wider font-crt">Módulo em Ajuste</div>
+              <div class="text-sm font-bold text-white uppercase flex items-center gap-2 font-header" id="selectedPartName">
+                Máscara da Cabeça
+              </div>
+            </div>
+          </div>
+
+          <!-- Controles de Ajuste da Parte -->
+          <div class="flex flex-wrap items-center gap-4 w-full lg:w-auto justify-between lg:justify-end">
+            <!-- Arquétipo da Parte -->
+            <div>
+              <label class="block text-[10px] text-gray-400 mb-1">Arquétipo do Módulo</label>
+              <select id="partStyleSelect" onchange="atualizarEstiloParteAtiva(this.value)" class="bg-fazbear-panel border border-fazbear-border text-xs text-amber-400 rounded px-2.5 py-1 focus:outline-none focus:border-fazbear-accent">
+                <option value="endo">Endoesqueleto (Exposto)</option>
+                <option value="classic">Clássico (Aveludado)</option>
+                <option value="toy">Toy (Plástico Brilhante)</option>
+                <option value="withered">Withered (Danificado)</option>
+                <option value="funtime">Funtime (Placas e Cromo)</option>
+                <option value="nightmare">Nightmare (Agressivo / Dentes)</option>
+              </select>
+            </div>
+
+            <!-- Paleta de Cores Rápida -->
+            <div>
+              <label class="block text-[10px] text-gray-400 mb-1">Cor Primária</label>
+              <div class="flex items-center gap-1.5" id="colorSwatches">
+                <!-- Bolotas de cores injetadas via JS -->
+              </div>
+            </div>
+
+            <!-- Color Picker Customizado -->
+            <div>
+              <label class="block text-[10px] text-gray-400 mb-1">Hex Personalizado</label>
+              <input type="color" id="partColorPicker" onchange="atualizarCorParteAtiva(this.value)" class="w-8 h-7 bg-fazbear-panel border border-fazbear-border rounded cursor-pointer">
+            </div>
+
+            <!-- Slider de Desgaste/Danificação -->
+            <div class="w-36">
+              <div class="flex justify-between text-[10px] text-gray-400 mb-1">
+                <span>Nível de Desgaste</span>
+                <span id="damageValText" class="text-fazbear-accent">0%</span>
+              </div>
+              <input type="range" id="damageSlider" min="0" max="100" value="0" oninput="atualizarDanoParteAtiva(this.value)" class="w-full">
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </main>
+
+    <!-- COLUNA DIREITA: Acessórios, Óptica e Ficha Técnica (Blueprint) -->
+    <aside class="w-88 bg-fazbear-dark border-l border-fazbear-border flex flex-col z-20 shrink-0 overflow-y-auto">
+      
+      <!-- Acessórios e Modificações -->
+      <div class="p-3 border-b border-fazbear-border bg-fazbear-panel">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-fazbear-accent flex items-center gap-2 font-header">
+          <i class="fa-solid fa-hat-wizard"></i> Modificações & Acessórios
+        </h2>
+      </div>
+
+      <div class="p-3 border-b border-fazbear-border space-y-3 bg-fazbear-black/40 text-xs">
+        
+        <!-- Lentes & Olhos Animatrônicos -->
+        <div>
+          <label class="block text-gray-400 mb-1 text-[11px] font-bold">Estilo de Óptica e Brilho</label>
+          <div class="grid grid-cols-2 gap-2">
+            <select id="eyeStyleSelect" onchange="atualizarEstiloOlhos(this.value)" class="bg-fazbear-panel border border-fazbear-border text-xs text-gray-200 rounded p-1.5">
+              <option value="normal">Normal (Plástico Gloss)</option>
+              <option value="glowing">Neon LED Ativo</option>
+              <option value="silver">Olho Endo Prateado</option>
+              <option value="blackout">Escuro / Ponto de Luz</option>
+              <option value="nightmare">Nightmare (Glow Vermelho)</option>
+            </select>
+            <input type="color" id="eyeColorPicker" value="#00e5ff" onchange="atualizarCorOlhos(this.value)" class="w-full h-8 bg-fazbear-panel border border-fazbear-border rounded cursor-pointer">
+          </div>
+        </div>
+
+        <!-- Acessório Mão Direita -->
+        <div>
+          <label class="block text-gray-400 mb-1 text-[11px] font-bold">Equipamento Mão Direita</label>
+          <select id="rightHandPropSelect" onchange="atualizarPropMao('direita', this.value)" class="w-full bg-fazbear-panel border border-fazbear-border text-xs text-gray-200 rounded p-1.5">
+            <option value="hand">Mão Padrão Animatrônica</option>
+            <option value="hook">Gancho de Pirata em Aço</option>
+            <option value="guitar">Guitarra de Rock Fazbear</option>
+            <option value="mic">Microfone de Palco Vintage</option>
+            <option value="claws">Garras Mecânicas Retráteis</option>
+          </select>
+        </div>
+
+        <!-- Acessórios de Palco Alternáveis -->
+        <div>
+          <label class="block text-gray-400 mb-1.5 text-[11px] font-bold">Adereços de Palco e Rosto</label>
+          <div class="grid grid-cols-2 gap-2">
+            <button onclick="alternarAcessorio('hat')" id="acc-hat-btn" class="p-2 bg-fazbear-panel border border-fazbear-border rounded text-left flex items-center gap-2 hover:border-fazbear-accent transition">
+              <i class="fa-solid fa-hat-cowboy text-amber-500"></i> Cartola
+            </button>
+            <button onclick="alternarAcessorio('bowtie')" id="acc-bowtie-btn" class="p-2 bg-fazbear-panel border border-fazbear-border rounded text-left flex items-center gap-2 hover:border-fazbear-accent transition">
+              <i class="fa-solid fa-ribbon text-red-500"></i> Gravata Borboleta
+            </button>
+            <button onclick="alternarAcessorio('cheeks')" id="acc-cheeks-btn" class="p-2 bg-fazbear-panel border border-fazbear-border rounded text-left flex items-center gap-2 hover:border-fazbear-accent transition">
+              <i class="fa-solid fa-circle text-pink-500"></i> Bochechas Coradas
+            </button>
+            <button onclick="alternarAcessorio('bib')" id="acc-bib-btn" class="p-2 bg-fazbear-panel border border-fazbear-border rounded text-left flex items-center gap-2 hover:border-fazbear-accent transition">
+              <i class="fa-solid fa-utensils text-yellow-500"></i> Avental 'LET'S EAT!'
+            </button>
+            <button onclick="alternarAcessorio('starGlasses')" id="acc-starGlasses-btn" class="p-2 bg-fazbear-panel border border-fazbear-border rounded text-left flex items-center gap-2 hover:border-fazbear-accent transition">
+              <i class="fa-solid fa-glasses text-cyan-400"></i> Óculos de Estrela
+            </button>
+            <button onclick="alternarAcessorio('extraTeeth')" id="acc-extraTeeth-btn" class="p-2 bg-fazbear-panel border border-fazbear-border rounded text-left flex items-center gap-2 hover:border-fazbear-accent transition">
+              <i class="fa-solid fa-teeth-open text-gray-300"></i> Dentes Duplos Afiados
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- PLANTA BAIXA / BLUEPRINT & FICHA TÉCNICA FAZBEAR -->
+      <div class="p-3 flex-1 flex flex-col justify-between">
+        <div>
+          <div class="hazard-stripe h-2 rounded-t mb-2"></div>
+          <div class="bg-fazbear-panel border border-fazbear-border p-3 rounded-b space-y-2 relative" id="specSheetCard">
+            <div class="flex justify-between items-start border-b border-fazbear-border pb-2">
+              <div>
+                <span class="text-[9px] text-gray-400 uppercase tracking-widest block font-crt">REGISTRO DE PROTÓTIPO</span>
+                <input type="text" id="animatronicName" value="PROTÓTIPO HYBRIDO #001" class="bg-transparent text-sm font-bold text-fazbear-accent font-header border-b border-dashed border-fazbear-border focus:outline-none focus:border-fazbear-accent w-full" onchange="atualizarFichaTecnica()">
+              </div>
+              <span class="text-[10px] bg-red-950 border border-red-700 text-red-400 px-1.5 py-0.5 rounded uppercase font-mono font-bold" id="dangerLevelTag">RISCO: ALTO</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 text-[10px] py-1">
+              <div>
+                <span class="text-gray-400 block">Nº DE SÉRIE:</span>
+                <span class="text-gray-200 font-mono" id="specSerial">FE-8492-BR</span>
+              </div>
+              <div>
+                <span class="text-gray-400 block">FUNÇÃO PRINCIPAL:</span>
+                <select id="specRoleSelect" onchange="atualizarFichaTecnica()" class="bg-fazbear-black text-amber-400 border border-fazbear-border text-[10px] rounded p-0.5 w-full">
+                  <option value="Vocalista Principal">Vocalista Principal</option>
+                  <option value="Guitarrista de Rock">Guitarrista de Rock</option>
+                  <option value="Atração Pirata">Atração Pirata</option>
+                  <option value="Patrulheiro de Segurança">Patrulheiro de Segurança</option>
+                  <option value="Sucata Descomissionada">Sucata Descomissionada</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="border-t border-fazbear-border pt-2 text-[10px]">
+              <span class="text-gray-400 block mb-1">COMPOSIÇÃO DOS ARQUÉTIPOS:</span>
+              <div class="w-full bg-fazbear-black h-2 rounded-full overflow-hidden flex" id="archetypeBar">
+                <!-- Barra proporcional dinâmica -->
+              </div>
+            </div>
+
+            <div class="text-[9px] text-gray-500 italic mt-2">
+              * PROPRIEDADE DA FAZBEAR ENTERTAINMENT. QUALQUER DESMONTAGEM NÃO AUTORIZADA CANCELARÁ A GARANTIA.
+            </div>
+          </div>
+        </div>
+
+        <!-- BOTOES DE EXPORTAÇÃO -->
+        <div class="mt-4 space-y-2">
+          <button onclick="exportarBlueprintPNG()" class="w-full py-2 bg-fazbear-accent hover:bg-amber-500 text-fazbear-black font-bold text-xs uppercase rounded transition flex items-center justify-center gap-2 box-glow-orange font-header">
+            <i class="fa-solid fa-download"></i> Exportar Blueprint (PNG)
+          </button>
+          <button onclick="exportarConfigJSON()" class="w-full py-1.5 bg-fazbear-panel hover:bg-fazbear-border border border-fazbear-border text-gray-300 text-xs rounded transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-file-code"></i> Salvar Ficha Spec (JSON)
+          </button>
+        </div>
+
+      </div>
+
+    </aside>
+
+  </div>
+
+  <!-- JAVASCRIPT & SINTETIZADOR WEB AUDIO -->
+  <script>
+    /* ========================================================================
+       1. ESTADO GLOBAL DA APLICAÇÃO & MODELOS
+       ======================================================================== */
+    
+    // Cores Padrão da Franquia FNAF
+    const PALETA_CORES = {
+      marrom: '#8B4513',       // Freddy
+      roxo: '#6A5ACD',         // Bonnie
+      amarelo: '#E6C200',      // Chica
+      vermelho: '#A52A2A',     // Foxy
+      toyCiano: '#00D2FF',     // Toy Bonnie
+      toyRosa: '#FF69B4',      // Toy Chica
+      funtimeBranco: '#E0E6ED',// Funtime White
+      scrapFerrugem: '#7F3A18',// Scrap Metal
+      sombra: '#1C1D22',       // Shadow / Lefty
+      endoAco: '#4a4e5a'       // Endo Metal
+    };
+
+    const MOSTRADOR_CORES = [
+      { nome: 'Marrom Freddy', hex: '#8B4513' },
+      { nome: 'Roxo Bonnie', hex: '#6A5ACD' },
+      { nome: 'Amarelo Chica', hex: '#E6C200' },
+      { nome: 'Vermelho Foxy', hex: '#A52A2A' },
+      { nome: 'Ciano Toy', hex: '#00D2FF' },
+      { nome: 'Branco Funtime', hex: '#E0E6ED' },
+      { nome: 'Ferrugem Sucata', hex: '#7F3A18' },
+      { nome: 'Preto Sombra', hex: '#1C1D22' }
+    ];
+
+    // Mapeamento dos Módulos do Animatrônico
+    const PARTES_ANIMATRONICO = [
+      { id: 'head', name: 'Máscara da Cabeça', category: 'cabeca', icon: 'fa-mask' },
+      { id: 'ears', name: 'Orelhas / Chifres', category: 'cabeca', icon: 'fa-ear-listen' },
+      { id: 'eyes', name: 'Módulo de Olhos', category: 'cabeca', icon: 'fa-eye' },
+      { id: 'torso', name: 'Carcaça do Tronco', category: 'tronco', icon: 'fa-shirt' },
+      { id: 'shoulders', name: 'Ombreiras de Aço', category: 'tronco', icon: 'fa-shield-halved' },
+      { id: 'pelvis', name: 'Bacia / Quadril', category: 'tronco', icon: 'fa-drum-steelpan' },
+      { id: 'leftArm', name: 'Braço Esquerdo', category: 'membros', icon: 'fa-arm-warmer' },
+      { id: 'rightArm', name: 'Braço Direito', category: 'membros', icon: 'fa-arm-warmer' },
+      { id: 'leftHand', name: 'Mão Esquerda', category: 'membros', icon: 'fa-hand' },
+      { id: 'rightHand', name: 'Mão Direita / Arma', category: 'membros', icon: 'fa-hand-back-fist' },
+      { id: 'legs', name: 'Coxas e Canelas', category: 'membros', icon: 'fa-socks' },
+      { id: 'feet', name: 'Pés Animatrônicos', category: 'membros', icon: 'fa-shoe-prints' }
+    ];
+
+    // Configuração Atual do Animatrônico
+    let configAnimatronico = {
+      activePartId: 'head',
+      endoGridVisible: true,
+      powerOn: false,
+      
+      eyeStyle: 'normal',
+      eyeColor: '#00e5ff',
+
+      rightHandProp: 'mic',
+      leftHandProp: 'hand',
+
+      accessories: {
+        hat: true,
+        bowtie: true,
+        cheeks: false,
+        bib: false,
+        starGlasses: false,
+        extraTeeth: false
+      },
+
+      parts: {
+        head: { style: 'classic', color: PALETA_CORES.marrom, damage: 0 },
+        ears: { style: 'classic', color: PALETA_CORES.marrom, damage: 0 },
+        eyes: { style: 'classic', color: '#ffffff', damage: 0 },
+        torso: { style: 'classic', color: PALETA_CORES.marrom, damage: 0 },
+        shoulders: { style: 'classic', color: PALETA_CORES.marrom, damage: 0 },
+        pelvis: { style: 'classic', color: PALETA_CORES.marrom, damage: 0 },
+        leftArm: { style: 'classic', color: PALETA_CORES.marrom, damage: 0 },
+        rightArm: { style: 'classic', color: PALETA_CORES.marrom, damage: 0 },
+        leftHand: { style: 'classic', color: PALETA_CORES.marrom, damage: 0 },
+        rightHand: { style: 'classic', color: PALETA_CORES.marrom, damage: 0 },
+        legs: { style: 'classic', color: PALETA_CORES.marrom, damage: 0 },
+        feet: { style: 'classic', color: PALETA_CORES.marrom, damage: 0 }
+      }
+    };
+
+    /* ========================================================================
+       2. SINTETIZADOR WEB AUDIO API (Sons Industriais e Jumpscare em JS Pure)
+       ======================================================================== */
+    let audioCtx = null;
+    let isMuted = false;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+    }
+
+    function alternarSom() {
+      isMuted = !isMuted;
+      const icon = document.getElementById('soundIcon');
+      const btn = document.getElementById('soundToggleBtn');
+      if (isMuted) {
+        icon.className = 'fa-solid fa-volume-xmark';
+        btn.classList.add('text-gray-500');
+      } else {
+        icon.className = 'fa-solid fa-volume-high';
+        btn.classList.remove('text-gray-500');
+        tocarSomClique();
+      }
+    }
+
+    function tocarSomClique() {
+      if (isMuted) return;
+      initAudio();
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(45, audioCtx.currentTime + 0.05);
+        gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.05);
+      } catch (e) {}
+    }
+
+    function tocarSomServo() {
+      if (isMuted) return;
+      initAudio();
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(110, audioCtx.currentTime);
+        osc.frequency.linearRampToValueAtTime(320, audioCtx.currentTime + 0.1);
+        osc.frequency.linearRampToValueAtTime(75, audioCtx.currentTime + 0.22);
+        
+        gain.gain.setValueAtTime(0.07, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.22);
+        
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.22);
+      } catch(e){}
+    }
+
+    // Rugido Sintetizado FNAF ao Testar Energia
+    function tocarRugidoJumpscare() {
+      if (isMuted) return;
+      initAudio();
+      try {
+        const agora = audioCtx.currentTime;
+        const duracao = 1.3;
+
+        // Ruído estático de rádio industrial
+        const bufferSize = audioCtx.sampleRate * duracao;
+        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = Math.random() * 2 - 1;
+        }
+
+        const noise = audioCtx.createBufferSource();
+        noise.buffer = buffer;
+
+        const noiseFilter = audioCtx.createBiquadFilter();
+        noiseFilter.type = 'bandpass';
+        noiseFilter.frequency.setValueAtTime(900, agora);
+        noiseFilter.Q.setValueAtTime(3, agora);
+
+        const noiseGain = audioCtx.createGain();
+        noiseGain.gain.setValueAtTime(0.35, agora);
+        noiseGain.gain.exponentialRampToValueAtTime(0.01, agora + duracao);
+
+        noise.connect(noiseFilter);
+        noiseFilter.connect(noiseGain);
+        noiseGain.connect(audioCtx.destination);
+
+        // Oscilador de tom gutural mecânico
+        const osc = audioCtx.createOscillator();
+        const oscGain = audioCtx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(105, agora);
+        osc.frequency.linearRampToValueAtTime(290, agora + 0.18);
+        osc.frequency.exponentialRampToValueAtTime(45, agora + duracao);
+
+        oscGain.gain.setValueAtTime(0.45, agora);
+        oscGain.gain.exponentialRampToValueAtTime(0.01, agora + duracao);
+
+        osc.connect(oscGain);
+        oscGain.connect(audioCtx.destination);
+
+        noise.start(agora);
+        osc.start(agora);
+        noise.stop(agora + duracao);
+        osc.stop(agora + duracao);
+      } catch(e){}
+    }
+
+    /* ==========================================================================
+       3. INICIALIZAÇÃO DA INTERFACE & HANDLERS
+       ========================================================================== */
+    window.addEventListener('DOMContentLoaded', () => {
+      renderizarListaPartes('todas');
+      renderizarMostradorCores();
+      atualizarUIParteSelecionada();
+      renderizarTodasPartesSVG();
+      atualizarFichaTecnica();
+    });
+
+    function filtrarPartes(cat) {
+      tocarSomClique();
+      document.querySelectorAll('.part-cat-btn').forEach(b => {
+        b.className = 'part-cat-btn py-1 rounded text-center bg-fazbear-panel hover:bg-fazbear-border text-gray-300';
+      });
+      document.getElementById(`btn-cat-${cat}`).className = 'part-cat-btn py-1 rounded text-center bg-fazbear-accent text-fazbear-black font-bold';
+      renderizarListaPartes(cat);
+    }
+
+    function renderizarListaPartes(filtroCategoria) {
+      const listEl = document.getElementById('partsList');
+      listEl.innerHTML = '';
+
+      const filtradas = filtroCategoria === 'todas' 
+        ? PARTES_ANIMATRONICO 
+        : PARTES_ANIMATRONICO.filter(p => p.category === filtroCategoria);
+
+      filtradas.forEach(parte => {
+        const isActive = parte.id === configAnimatronico.activePartId;
+        const pCfg = configAnimatronico.parts[parte.id];
+
+        const item = document.createElement('div');
+        item.className = `p-2.5 rounded border cursor-pointer transition flex items-center justify-between ${
+          isActive 
+            ? 'bg-fazbear-panel border-fazbear-accent text-white shadow-md' 
+            : 'bg-fazbear-dark/80 border-fazbear-border text-gray-400 hover:border-gray-500'
+        }`;
+        item.onclick = () => selecionarParte(parte.id);
+
+        item.innerHTML = `
+          <div class="flex items-center gap-2.5">
+            <div class="w-7 h-7 rounded flex items-center justify-center text-xs ${isActive ? 'bg-fazbear-accent text-fazbear-black' : 'bg-fazbear-black text-gray-400'}">
+              <i class="fa-solid ${parte.icon}"></i>
+            </div>
+            <div>
+              <div class="text-xs font-bold leading-none ${isActive ? 'text-amber-400' : 'text-gray-300'}">${parte.name}</div>
+              <div class="text-[9px] text-gray-500 uppercase mt-0.5">${pCfg.style} • ${pCfg.damage}% dano</div>
+            </div>
+          </div>
+          <div class="w-3.5 h-3.5 rounded-full border border-gray-600" style="background-color: ${pCfg.color}"></div>
+        `;
+
+        listEl.appendChild(item);
+      });
+
+      document.getElementById('partCountLabel').innerText = `${PARTES_ANIMATRONICO.length} Módulos`;
+    }
+
+    function renderizarMostradorCores() {
+      const container = document.getElementById('colorSwatches');
+      container.innerHTML = '';
+      MOSTRADOR_CORES.forEach(swatch => {
+        const btn = document.createElement('button');
+        btn.className = 'w-5 h-5 rounded-full border border-fazbear-border hover:scale-110 transition shadow-sm';
+        btn.style.backgroundColor = swatch.hex;
+        btn.title = swatch.nome;
+        btn.onclick = () => atualizarCorParteAtiva(swatch.hex);
+        container.appendChild(btn);
+      });
+    }
+
+    function selecionarParte(partId) {
+      tocarSomServo();
+      configAnimatronico.activePartId = partId;
+      renderizarListaPartes('todas');
+      atualizarUIParteSelecionada();
+    }
+
+    function atualizarUIParteSelecionada() {
+      const parteObj = PARTES_ANIMATRONICO.find(p => p.id === configAnimatronico.activePartId);
+      const pCfg = configAnimatronico.parts[configAnimatronico.activePartId];
+
+      document.getElementById('selectedPartName').innerText = parteObj.name;
+      document.getElementById('selectedPartIcon').className = `fa-solid ${parteObj.icon}`;
+      document.getElementById('partStyleSelect').value = pCfg.style;
+      document.getElementById('partColorPicker').value = pCfg.color;
+      document.getElementById('damageSlider').value = pCfg.damage;
+      document.getElementById('damageValText').innerText = `${pCfg.damage}%`;
+    }
+
+    /* ==========================================================================
+       4. ALTERAÇÕES DE CONFIGURAÇÃO & ARQUÉTIPOS
+       ========================================================================== */
+    function atualizarEstiloParteAtiva(estilo) {
+      tocarSomClique();
+      configAnimatronico.parts[configAnimatronico.activePartId].style = estilo;
+      renderizarListaPartes('todas');
+      renderizarTodasPartesSVG();
+      atualizarFichaTecnica();
+    }
+
+    function atualizarCorParteAtiva(hex) {
+      tocarSomClique();
+      configAnimatronico.parts[configAnimatronico.activePartId].color = hex;
+      document.getElementById('partColorPicker').value = hex;
+      renderizarListaPartes('todas');
+      renderizarTodasPartesSVG();
+      atualizarFichaTecnica();
+    }
+
+    function atualizarDanoParteAtiva(val) {
+      configAnimatronico.parts[configAnimatronico.activePartId].damage = parseInt(val);
+      document.getElementById('damageValText').innerText = `${val}%`;
+      renderizarListaPartes('todas');
+      renderizarTodasPartesSVG();
+      atualizarFichaTecnica();
+    }
+
+    function aplicarArquetipoGlobal(arquetipo) {
+      tocarSomServo();
+      let mapaCores = {
+        endo: PALETA_CORES.endoAco,
+        classic: PALETA_CORES.marrom,
+        toy: PALETA_CORES.toyCiano,
+        withered: PALETA_CORES.roxo,
+        funtime: PALETA_CORES.funtimeBranco,
+        nightmare: PALETA_CORES.scrapFerrugem
+      };
+
+      Object.keys(configAnimatronico.parts).forEach(pId => {
+        configAnimatronico.parts[pId].style = arquetipo;
+        configAnimatronico.parts[pId].color = mapaCores[arquetipo] || PALETA_CORES.marrom;
+        configAnimatronico.parts[pId].damage = arquetipo === 'withered' ? 65 : (arquetipo === 'nightmare' ? 85 : 0);
+      });
+
+      atualizarUIParteSelecionada();
+      renderizarListaPartes('todas');
+      renderizarTodasPartesSVG();
+      atualizarFichaTecnica();
+    }
+
+    function gerarHibridoAleatorio() {
+      tocarSomServo();
+      const estilos = ['endo', 'classic', 'toy', 'withered', 'funtime', 'nightmare'];
+      const cores = Object.values(PALETA_CORES);
+
+      Object.keys(configAnimatronico.parts).forEach(pId => {
+        configAnimatronico.parts[pId].style = estilos[Math.floor(Math.random() * estilos.length)];
+        configAnimatronico.parts[pId].color = cores[Math.floor(Math.random() * cores.length)];
+        configAnimatronico.parts[pId].damage = Math.floor(Math.random() * 75);
+      });
+
+      atualizarUIParteSelecionada();
+      renderizarListaPartes('todas');
+      renderizarTodasPartesSVG();
+      atualizarFichaTecnica();
+    }
+
+    function alternarVisibilidadeEndo() {
+      tocarSomClique();
+      configAnimatronico.endoGridVisible = !configAnimatronico.endoGridVisible;
+      const endoGroup = document.getElementById('layer-endoskeleton');
+      const icon = document.getElementById('endoVisIcon');
+      if (configAnimatronico.endoGridVisible) {
+        endoGroup.setAttribute('opacity', '1');
+        icon.className = 'fa-solid fa-eye';
+      } else {
+        endoGroup.setAttribute('opacity', '0.12');
+        icon.className = 'fa-solid fa-eye-slash';
+      }
+    }
+
+    function alternarTesteEnergia() {
+      configAnimatronico.powerOn = !configAnimatronico.powerOn;
+      const btnText = document.getElementById('powerBtnText');
+      const stage = document.getElementById('canvasStage');
+      const glow = document.getElementById('jumpscareGlow');
+
+      if (configAnimatronico.powerOn) {
+        tocarRugidoJumpscare();
+        btnText.innerText = "SISTEMA ONLINE / DESLIGAR";
+        stage.classList.add('twitching');
+        glow.className = 'absolute inset-0 bg-red-600/20 pointer-events-none transition-colors duration-100 rounded-lg box-glow-orange';
+        
+        document.querySelectorAll('.eye-lens').forEach(el => {
+          el.classList.add('eye-glowing');
+        });
+      } else {
+        tocarSomClique();
+        btnText.innerText = "LIGAR ANIMATRÔNICO / TESTE";
+        stage.classList.remove('twitching');
+        glow.className = 'absolute inset-0 bg-red-600/0 pointer-events-none transition-colors duration-100 rounded-lg';
+        
+        document.querySelectorAll('.eye-lens').forEach(el => {
+          el.classList.remove('eye-glowing');
+        });
+      }
+    }
+
+    function alternarAcessorio(accKey) {
+      tocarSomClique();
+      configAnimatronico.accessories[accKey] = !configAnimatronico.accessories[accKey];
+      const btn = document.getElementById(`acc-${accKey}-btn`);
+      if (configAnimatronico.accessories[accKey]) {
+        btn.classList.add('border-fazbear-accent', 'bg-amber-950/40');
+      } else {
+        btn.classList.remove('border-fazbear-accent', 'bg-amber-950/40');
+      }
+      renderizarTodasPartesSVG();
+    }
+
+    function atualizarEstiloOlhos(val) {
+      tocarSomClique();
+      configAnimatronico.eyeStyle = val;
+      renderizarTodasPartesSVG();
+    }
+
+    function atualizarCorOlhos(hex) {
+      configAnimatronico.eyeColor = hex;
+      renderizarTodasPartesSVG();
+    }
+
+    function atualizarPropMao(lado, propVal) {
+      tocarSomClique();
+      if (lado === 'direita') configAnimatronico.rightHandProp = propVal;
+      else configAnimatronico.leftHandProp = propVal;
+      renderizarTodasPartesSVG();
+    }
+
+    /* ==========================================================================
+       5. RENDERIZADOR VETORIAL SVG MULTICAMADAS
+       ========================================================================== */
+    function renderizarTodasPartesSVG() {
+      renderCabecaSVG();
+      renderOrelhasSVG();
+      renderOlhosSVG();
+      renderTroncoSVG();
+      renderOmbrosSVG();
+      renderBracosEMaosSVG();
+      renderPernasEPesSVG();
+      renderAcessoriosSVG();
+    }
+
+    function obterPreenchimentoEstilo(pConfig) {
+      const { style, color, damage } = pConfig;
+      if (style === 'endo') return 'url(#endoMetal)';
+      if (style === 'funtime') return 'url(#chromeGrad)';
+      if (style === 'nightmare' && damage > 50) return 'url(#rustGrad)';
+      return color;
+    }
+
+    function obterBordaDano(damage) {
+      if (damage > 60) return '#050505';
+      if (damage > 30) return '#1a1a1a';
+      return '#000000';
+    }
+
+    // 1. RENDERIZADOR DA CABEÇA
+    function renderCabecaSVG() {
+      const layer = document.getElementById('layer-head');
+      const cfg = configAnimatronico.parts.head;
+      const fill = obterPreenchimentoEstilo(cfg);
+      const stroke = obterBordaDano(cfg.damage);
+
+      if (cfg.style === 'endo') {
+        layer.innerHTML = ''; // Permite ver o Endoesqueleto puro
+        return;
+      }
+
+      let html = '';
+
+      if (cfg.style === 'classic') {
+        html = `
+          <ellipse cx="250" cy="100" rx="42" ry="24" fill="${fill}" stroke="${stroke}" stroke-width="3" />
+          <circle cx="250" cy="72" r="48" fill="${fill}" stroke="${stroke}" stroke-width="3" />
+          <ellipse cx="250" cy="84" rx="26" ry="16" fill="#f0d3a7" stroke="#111" stroke-width="2"/>
+          <ellipse cx="250" cy="76" rx="10" ry="6" fill="#111"/>
+          <path d="M 220 98 Q 250 112 280 98" fill="none" stroke="#fff" stroke-width="4" stroke-dasharray="6,2"/>
+        `;
+      } else if (cfg.style === 'toy') {
+        html = `
+          <circle cx="250" cy="70" r="50" fill="${fill}" stroke="${stroke}" stroke-width="2" />
+          <ellipse cx="250" cy="85" rx="28" ry="18" fill="#ffffff" opacity="0.9"/>
+          <ellipse cx="250" cy="77" rx="8" ry="5" fill="#111"/>
+          <circle cx="215" cy="82" r="10" fill="#ff2255" opacity="0.85"/>
+          <circle cx="285" cy="82" r="10" fill="#ff2255" opacity="0.85"/>
+        `;
+      } else if (cfg.style === 'funtime') {
+        html = `
+          <circle cx="250" cy="70" r="48" fill="${fill}" stroke="#333" stroke-width="2"/>
+          <line x1="250" y1="22" x2="250" y2="118" stroke="#111" stroke-width="2"/>
+          <line x1="202" y1="70" x2="298" y2="70" stroke="#111" stroke-width="2"/>
+          <ellipse cx="250" cy="85" rx="22" ry="14" fill="#ffb6c1"/>
+          <ellipse cx="250" cy="78" rx="7" ry="5" fill="#222"/>
+        `;
+      } else if (cfg.style === 'withered' || cfg.style === 'nightmare') {
+        html = `
+          <circle cx="250" cy="70" r="48" fill="${fill}" stroke="${stroke}" stroke-width="3" />
+          <path d="M 220 50 Q 235 65 225 80 Z" fill="#08080a" stroke="#000"/>
+          <path d="M 260 40 Q 280 45 270 65 Z" fill="#08080a" stroke="#000"/>
+          <ellipse cx="250" cy="86" rx="25" ry="15" fill="#5c5246"/>
+          <ellipse cx="250" cy="78" rx="9" ry="6" fill="#000"/>
+          <path d="M 222 96 L 278 96" stroke="#fff" stroke-width="5" stroke-dasharray="4,3"/>
+        `;
+      }
+
+      if (cfg.damage > 40) {
+        html += `<path d="M 230 35 L 245 55 L 238 65" fill="none" stroke="#111" stroke-width="3"/>`;
+      }
+
+      layer.innerHTML = html;
+    }
+
+    // 2. RENDERIZADOR DAS ORELHAS
+    function renderOrelhasSVG() {
+      const layer = document.getElementById('layer-ears');
+      const cfg = configAnimatronico.parts.ears;
+      if (cfg.style === 'endo') { layer.innerHTML = ''; return; }
+      const fill = obterPreenchimentoEstilo(cfg);
+
+      let html = '';
+      if (cfg.style === 'classic' || cfg.style === 'toy') {
+        html = `
+          <circle cx="195" cy="30" r="16" fill="${fill}" stroke="#111" stroke-width="2"/>
+          <circle cx="195" cy="30" r="9" fill="#f0d3a7"/>
+          <circle cx="305" cy="30" r="16" fill="${fill}" stroke="#111" stroke-width="2"/>
+          <circle cx="305" cy="30" r="9" fill="#f0d3a7"/>
+        `;
+      } else if (cfg.style === 'withered') {
+        html = `
+          <rect x="188" y="-20" width="16" height="45" rx="8" fill="${fill}" stroke="#111" stroke-width="2" transform="rotate(-12 195 20)"/>
+          <rect x="296" y="5" width="16" height="25" rx="5" fill="${fill}" stroke="#111" stroke-width="2" transform="rotate(15 300 20)"/>
+          <path d="M 304 -5 L 300 8 M 308 -8 L 305 8" stroke="#ff2a2a" stroke-width="2"/>
+        `;
+      } else {
+        html = `
+          <polygon points="180,45 200,10 215,48" fill="${fill}" stroke="#111" stroke-width="2"/>
+          <polygon points="320,45 300,10 285,48" fill="${fill}" stroke="#111" stroke-width="2"/>
+        `;
+      }
+      layer.innerHTML = html;
+    }
+
+    // 3. RENDERIZADOR DOS OLHOS
+    function renderOlhosSVG() {
+      const layer = document.getElementById('layer-eyes');
+      const cor = configAnimatronico.eyeColor;
+      const estilo = configAnimatronico.eyeStyle;
+
+      let esq = '', dir = '';
+
+      if (estilo === 'normal') {
+        esq = `<circle cx="232" cy="65" r="9" fill="#fff" stroke="#111"/><circle cx="232" cy="65" r="5" fill="${cor}" class="eye-lens"/><circle cx="230" cy="63" r="2" fill="#fff"/>`;
+        dir = `<circle cx="268" cy="65" r="9" fill="#fff" stroke="#111"/><circle cx="268" cy="65" r="5" fill="${cor}" class="eye-lens"/><circle cx="266" cy="63" r="2" fill="#fff"/>`;
+      } else if (estilo === 'glowing') {
+        esq = `<circle cx="232" cy="65" r="9" fill="#111"/><circle cx="232" cy="65" r="6" fill="${cor}" class="eye-lens eye-glowing"/><circle cx="232" cy="65" r="2" fill="#fff"/>`;
+        dir = `<circle cx="268" cy="65" r="9" fill="#111"/><circle cx="268" cy="65" r="6" fill="${cor}" class="eye-lens eye-glowing"/><circle cx="268" cy="65" r="2" fill="#fff"/>`;
+      } else if (estilo === 'blackout') {
+        esq = `<circle cx="232" cy="65" r="9" fill="#000"/><circle cx="232" cy="65" r="2.5" fill="#fff" class="eye-lens"/>`;
+        dir = `<circle cx="268" cy="65" r="9" fill="#000"/><circle cx="268" cy="65" r="2.5" fill="#fff" class="eye-lens"/>`;
+      } else if (estilo === 'nightmare') {
+        esq = `<circle cx="232" cy="65" r="9" fill="#200"/><circle cx="232" cy="65" r="5" fill="#ff0000" class="eye-lens eye-glowing"/><circle cx="232" cy="65" r="1.5" fill="#ffff00"/>`;
+        dir = `<circle cx="268" cy="65" r="9" fill="#200"/><circle cx="268" cy="65" r="5" fill="#ff0000" class="eye-lens eye-glowing"/><circle cx="268" cy="65" r="1.5" fill="#ffff00"/>`;
+      } else {
+        esq = `<circle cx="232" cy="65" r="8" fill="url(#chromeGrad)" stroke="#111"/><circle cx="232" cy="65" r="3" fill="#111"/>`;
+        dir = `<circle cx="268" cy="65" r="8" fill="url(#chromeGrad)" stroke="#111"/><circle cx="268" cy="65" r="3" fill="#111"/>`;
+      }
+
+      layer.innerHTML = esq + dir;
+    }
+
+    // 4. RENDERIZADOR DO TRONCO
+    function renderTroncoSVG() {
+      const layer = document.getElementById('layer-torso');
+      const cfg = configAnimatronico.parts.torso;
+      if (cfg.style === 'endo') { layer.innerHTML = ''; return; }
+
+      const fill = obterPreenchimentoEstilo(cfg);
+      const stroke = obterBordaDano(cfg.damage);
+
+      let html = '';
+
+      if (cfg.style === 'toy' || cfg.style === 'funtime') {
+        html = `
+          <path d="M 180 150 L 320 150 L 300 290 L 200 290 Z" fill="${fill}" stroke="${stroke}" stroke-width="3" rx="10"/>
+          <ellipse cx="250" cy="220" rx="45" ry="55" fill="#ffffff" opacity="0.8"/>
+        `;
+      } else if (cfg.style === 'withered' || cfg.style === 'nightmare') {
+        html = `
+          <path d="M 175 145 L 325 145 L 295 295 L 205 295 Z" fill="${fill}" stroke="${stroke}" stroke-width="3"/>
+          <ellipse cx="250" cy="230" rx="42" ry="35" fill="#08080a" stroke="#000" stroke-width="2"/>
+          <line x1="220" y1="215" x2="280" y2="215" stroke="url(#endoMetal)" stroke-width="6"/>
+          <line x1="215" y1="235" x2="285" y2="235" stroke="url(#endoMetal)" stroke-width="6"/>
+          <line x1="222" y1="255" x2="278" y2="255" stroke="url(#endoMetal)" stroke-width="6"/>
+        `;
+      } else {
+        html = `
+          <path d="M 175 145 Q 250 135 325 145 L 295 290 Q 250 300 205 290 Z" fill="${fill}" stroke="${stroke}" stroke-width="3"/>
+          <ellipse cx="250" cy="225" rx="45" ry="50" fill="#f0d3a7"/>
+        `;
+      }
+
+      layer.innerHTML = html;
+    }
+
+    // 5. RENDERIZADOR DOS OMBROS
+    function renderOmbrosSVG() {
+      const layer = document.getElementById('layer-shoulders');
+      const cfg = configAnimatronico.parts.shoulders;
+      if (cfg.style === 'endo') { layer.innerHTML = ''; return; }
+      const fill = obterPreenchimentoEstilo(cfg);
+
+      layer.innerHTML = `
+        <circle cx="160" cy="152" r="18" fill="${fill}" stroke="#111" stroke-width="2"/>
+        <circle cx="340" cy="152" r="18" fill="${fill}" stroke="#111" stroke-width="2"/>
+      `;
+    }
+
+    // 6. RENDERIZADOR DOS BRAÇOS E MÃOS
+    function renderBracosEMaosSVG() {
+      const layerA = document.getElementById('layer-arms');
+      const layerH = document.getElementById('layer-hands');
+
+      const lArmCfg = configAnimatronico.parts.leftArm;
+      const rArmCfg = configAnimatronico.parts.rightArm;
+
+      const lFill = obterPreenchimentoEstilo(lArmCfg);
+      const rFill = obterPreenchimentoEstilo(rArmCfg);
+
+      let armHtml = '';
+      if (lArmCfg.style !== 'endo') {
+        armHtml += `
+          <rect x="135" y="165" width="22" height="65" rx="8" fill="${lFill}" stroke="#111" stroke-width="2" transform="rotate(12 140 170)"/>
+          <rect x="115" y="245" width="20" height="65" rx="8" fill="${lFill}" stroke="#111" stroke-width="2" transform="rotate(15 120 250)"/>
+        `;
+      }
+      if (rArmCfg.style !== 'endo') {
+        armHtml += `
+          <rect x="343" y="165" width="22" height="65" rx="8" fill="${rFill}" stroke="#111" stroke-width="2" transform="rotate(-12 360 170)"/>
+          <rect x="365" y="245" width="20" height="65" rx="8" fill="${rFill}" stroke="#111" stroke-width="2" transform="rotate(-15 370 250)"/>
+        `;
+      }
+
+      let handHtml = `<circle cx="108" cy="325" r="14" fill="${lFill}" stroke="#111" stroke-width="2"/>`;
+
+      const prop = configAnimatronico.rightHandProp;
+      if (prop === 'hook') {
+        handHtml += `<path d="M 390 315 L 392 335 Q 410 345 395 365 Q 380 340 392 335" fill="url(#chromeGrad)" stroke="#111" stroke-width="2"/>`;
+      } else if (prop === 'mic') {
+        handHtml += `
+          <circle cx="392" cy="325" r="14" fill="${rFill}" stroke="#111" stroke-width="2"/>
+          <rect x="388" y="325" width="8" height="35" fill="#222" rx="2" transform="rotate(-10 390 325)"/>
+          <circle cx="384" cy="320" r="9" fill="url(#chromeGrad)" stroke="#111"/>
+        `;
+      } else if (prop === 'guitar') {
+        handHtml += `
+          <g transform="translate(290, 260) rotate(-25)">
+            <path d="M 20 60 L 60 20 L 80 50 L 50 80 Z" fill="#ff2a2a" stroke="#111" stroke-width="2"/>
+            <rect x="55" y="10" width="8" height="90" fill="#333"/>
+            <circle cx="45" cy="52" r="12" fill="#111"/>
+          </g>
+        `;
+      } else if (prop === 'claws') {
+        handHtml += `
+          <circle cx="392" cy="325" r="12" fill="${rFill}" stroke="#111"/>
+          <path d="M 388 335 L 385 365 M 392 335 L 393 370 M 397 335 L 402 365" stroke="url(#chromeGrad)" stroke-width="3"/>
+        `;
+      } else {
+        handHtml += `<circle cx="392" cy="325" r="14" fill="${rFill}" stroke="#111" stroke-width="2"/>`;
+      }
+
+      layerA.innerHTML = armHtml;
+      layerH.innerHTML = handHtml;
+    }
+
+    // 7. RENDERIZADOR DAS PERNAS E PÉS
+    function renderPernasEPesSVG() {
+      const layerL = document.getElementById('layer-legs');
+      const layerP = document.getElementById('layer-pelvis');
+      const layerF = document.getElementById('layer-feet');
+
+      const pCfg = configAnimatronico.parts.pelvis;
+      const lCfg = configAnimatronico.parts.legs;
+      const fCfg = configAnimatronico.parts.feet;
+
+      if (pCfg.style !== 'endo') {
+        layerP.innerHTML = `<path d="M 190 295 L 310 295 L 280 340 L 220 340 Z" fill="${obterPreenchimentoEstilo(pCfg)}" stroke="#111" stroke-width="2" rx="5"/>`;
+      } else { layerP.innerHTML = ''; }
+
+      if (lCfg.style !== 'endo') {
+        const lFill = obterPreenchimentoEstilo(lCfg);
+        layerL.innerHTML = `
+          <rect x="176" y="340" width="28" height="85" rx="10" fill="${lFill}" stroke="#111" stroke-width="2"/>
+          <rect x="172" y="445" width="26" height="90" rx="10" fill="${lFill}" stroke="#111" stroke-width="2"/>
+          <rect x="296" y="340" width="28" height="85" rx="10" fill="${lFill}" stroke="#111" stroke-width="2"/>
+          <rect x="302" y="445" width="26" height="90" rx="10" fill="${lFill}" stroke="#111" stroke-width="2"/>
+        `;
+      } else { layerL.innerHTML = ''; }
+
+      if (fCfg.style !== 'endo') {
+        const fFill = obterPreenchimentoEstilo(fCfg);
+        layerF.innerHTML = `
+          <path d="M 155 545 Q 185 535 205 545 L 205 565 Q 180 570 155 565 Z" fill="${fFill}" stroke="#111" stroke-width="2"/>
+          <circle cx="165" cy="560" r="4" fill="#222"/>
+          <circle cx="180" cy="562" r="4" fill="#222"/>
+          <circle cx="195" cy="560" r="4" fill="#222"/>
+          <path d="M 295 545 Q 315 535 345 545 L 345 565 Q 320 570 295 565 Z" fill="${fFill}" stroke="#111" stroke-width="2"/>
+          <circle cx="305" cy="560" r="4" fill="#222"/>
+          <circle cx="320" cy="562" r="4" fill="#222"/>
+          <circle cx="335" cy="560" r="4" fill="#222"/>
+        `;
+      } else { layerF.innerHTML = ''; }
+    }
+
+    // 8. RENDERIZADOR DOS ACESSÓRIOS
+    function renderAcessoriosSVG() {
+      const layer = document.getElementById('layer-accessories');
+      const acc = configAnimatronico.accessories;
+      let html = '';
+
+      if (acc.hat) {
+        html += `
+          <g>
+            <ellipse cx="250" cy="26" rx="26" ry="6" fill="#111" stroke="#000"/>
+            <rect x="234" y="-4" width="32" height="28" fill="#181818" rx="2" stroke="#000"/>
+            <rect x="234" y="18" width="32" height="5" fill="#ff2a2a"/>
+          </g>
+        `;
+      }
+
+      if (acc.bowtie) {
+        html += `
+          <g transform="translate(250, 132)">
+            <polygon points="-18,-10 -18,10 0,2 18,10 18,-10 0,-2" fill="#cc0000" stroke="#111"/>
+            <circle cx="0" cy="0" r="4" fill="#990000"/>
+          </g>
+        `;
+      }
+
+      if (acc.cheeks) {
+        html += `
+          <circle cx="212" cy="82" r="9" fill="#ff0044" opacity="0.8"/>
+          <circle cx="288" cy="82" r="9" fill="#ff0044" opacity="0.8"/>
+        `;
+      }
+
+      if (acc.bib) {
+        html += `
+          <path d="M 215 145 Q 250 185 285 145 Q 275 220 225 220 Z" fill="#ffffff" stroke="#111" stroke-width="2"/>
+          <text x="250" y="180" font-size="9" font-family="VT323" font-weight="bold" fill="#ff0055" text-anchor="middle">LET'S EAT!!!</text>
+        `;
+      }
+
+      if (acc.starGlasses) {
+        html += `
+          <g fill="#00e5ff" opacity="0.9" stroke="#111">
+            <polygon points="232,58 235,65 242,65 236,70 238,77 232,72 226,77 228,70 222,65 229,65" transform="scale(0.8) translate(50, 10)"/>
+            <polygon points="268,58 271,65 278,65 272,70 274,77 268,72 262,77 264,70 258,65 265,65" transform="scale(0.8) translate(100, 10)"/>
+            <line x1="232" y1="62" x2="268" y2="62" stroke="#00e5ff" stroke-width="3"/>
+          </g>
+        `;
+      }
+
+      if (acc.extraTeeth) {
+        html += `
+          <path d="M 230 102 L 234 110 L 238 102 L 242 110 L 246 102 L 250 110 L 254 102 L 258 110 L 262 102 L 266 110 L 270 102" fill="none" stroke="#ffffff" stroke-width="2"/>
+        `;
+      }
+
+      layer.innerHTML = html;
+    }
+
+    /* ==========================================================================
+       6. FICHA TÉCNICA E EXPORTAÇÃO (BLUEPRINT)
+       ========================================================================== */
+    function atualizarFichaTecnica() {
+      const contagem = { endo: 0, classic: 0, toy: 0, withered: 0, funtime: 0, nightmare: 0 };
+      let danoTotal = 0;
+
+      Object.values(configAnimatronico.parts).forEach(p => {
+        contagem[p.style] = (contagem[p.style] || 0) + 1;
+        danoTotal += p.damage;
+      });
+
+      const danoMedio = Math.round(danoTotal / 12);
+      const dangerTag = document.getElementById('dangerLevelTag');
+
+      if (danoMedio > 60 || contagem.nightmare > 3 || contagem.withered > 4) {
+        dangerTag.innerText = "RISCO: EXTREMO";
+        dangerTag.className = "text-[10px] bg-red-950 border border-red-600 text-red-400 px-1.5 py-0.5 rounded font-mono font-bold glow-red";
+      } else if (danoMedio > 30) {
+        dangerTag.innerText = "RISCO: MODERADO";
+        dangerTag.className = "text-[10px] bg-amber-950 border border-amber-600 text-amber-400 px-1.5 py-0.5 rounded font-mono font-bold";
+      } else {
+        dangerTag.innerText = "RISCO: BAIXO";
+        dangerTag.className = "text-[10px] bg-emerald-950 border border-emerald-600 text-emerald-400 px-1.5 py-0.5 rounded font-mono font-bold";
+      }
+
+      const bar = document.getElementById('archetypeBar');
+      bar.innerHTML = `
+        <div class="bg-gray-600 h-full" style="width: ${(contagem.endo/12)*100}%" title="Endo"></div>
+        <div class="bg-amber-700 h-full" style="width: ${(contagem.classic/12)*100}%" title="Clássico"></div>
+        <div class="bg-cyan-500 h-full" style="width: ${(contagem.toy/12)*100}%" title="Toy"></div>
+        <div class="bg-red-700 h-full" style="width: ${(contagem.withered/12)*100}%" title="Withered"></div>
+        <div class="bg-pink-400 h-full" style="width: ${(contagem.funtime/12)*100}%" title="Funtime"></div>
+        <div class="bg-purple-800 h-full" style="width: ${(contagem.nightmare/12)*100}%" title="Nightmare"></div>
+      `;
+    }
+
+    function exportarBlueprintPNG() {
+      tocarSomClique();
+      const svgElement = document.getElementById('animatronicSvg');
+      const svgData = new XMLSerializer().serializeToString(svgElement);
+      const canvas = document.createElement('canvas');
+      canvas.width = 600;
+      canvas.height = 780;
+      const ctx = canvas.getContext('2d');
+
+      ctx.fillStyle = "#08080a";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.strokeStyle = "rgba(255, 157, 0, 0.15)";
+      ctx.lineWidth = 1;
+      for (let x = 0; x < canvas.width; x += 30) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+      }
+      for (let y = 0; y < canvas.height; y += 30) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+      }
+
+      const img = new Image();
+      const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+      const url = URL.createObjectURL(svgBlob);
+
+      img.onload = function () {
+        ctx.drawImage(img, 50, 40, 500, 650);
+
+        const nome = document.getElementById('animatronicName').value;
+        ctx.font = "bold 18px 'Orbitron', monospace";
+        ctx.fillStyle = "#ff9d00";
+        ctx.fillText(`FAZBEAR BLUEPRINT: ${nome.toUpperCase()}`, 30, 730);
+
+        ctx.font = "12px 'Share Tech Mono', monospace";
+        ctx.fillStyle = "#888";
+        ctx.fillText("ENGENHARIA FAZBEAR ENTERTAINMENT • REGISTRO CONFIDENCIAL", 30, 750);
+
+        const imgURL = canvas.toDataURL('image/png');
+        const dlLink = document.createElement('a');
+        dlLink.download = `${nome.replace(/\s+/g, '_')}_Blueprint.png`;
+        dlLink.href = imgURL;
+        dlLink.click();
+        URL.revokeObjectURL(url);
+      };
+
+      img.src = url;
+    }
+
+    function exportarConfigJSON() {
+      tocarSomClique();
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(configAnimatronico, null, 2));
+      const downloadAnchor = document.createElement('a');
+      const nome = document.getElementById('animatronicName').value;
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `${nome.replace(/\s+/g, '_')}_Spec.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+  </script>
+</body>
+</html>
